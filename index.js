@@ -20,6 +20,7 @@ async function run() {
     try {
         const postCollection = client.db('SocioPlus').collection('posts');
         const commentCollection = client.db('SocioPlus').collection('comments');
+        const infoCollection = client.db('SocioPlus').collection('infos');
 
         // posts api
         app.get('/posts', async (req, res) => {
@@ -74,6 +75,16 @@ async function run() {
             const comment = req.body;
             const result = await commentCollection.insertOne(comment);
             res.send(result);
+        });
+
+        // infos api
+        app.get('/infos/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {
+                _id: new ObjectId(id)
+            }
+            const aboutInfo = await infoCollection.findOne(query);
+            res.send(aboutInfo);
         });
     }
     finally {
