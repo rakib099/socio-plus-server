@@ -23,9 +23,26 @@ async function run() {
 
         // posts api
         app.get('/posts', async (req, res) => {
-            const query = {};
-            const cursor = postCollection.find(query);
-            const result = await cursor.toArray();
+            let query = {};
+            const page = req.query?.page;
+            let options = {
+                sort: {
+                    time: -1
+                }
+            }
+            let cursor = postCollection.find(query, options);
+            let result = await cursor.toArray();
+
+            if (page === 'home') {
+                options = {
+                    sort: {
+                        likes: -1
+                    }
+                }
+                cursor = postCollection.find(query, options);
+                result = await cursor.limit(3).toArray();
+            }
+            
             res.send(result);
         });
 
@@ -34,6 +51,12 @@ async function run() {
             const query = { _id: new ObjectId(id) };
             const post = await postCollection.findOne(query);
             res.send(post);
+        });
+
+        app.post('/posts', async (req, res) => {
+            const post = req.body;
+            const result = await postCollection.insertOne(post);
+            res.send(result);
         });
 
         // comments api
@@ -49,7 +72,6 @@ async function run() {
 
         app.post('/comments', async (req, res) => {
             const comment = req.body;
-            console.log(comment);
             const result = await commentCollection.insertOne(comment);
             res.send(result);
         });
