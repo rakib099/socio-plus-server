@@ -86,6 +86,19 @@ async function run() {
             const aboutInfo = await infoCollection.findOne(query);
             res.send(aboutInfo);
         });
+
+        app.patch('/infos/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateInfo = req.body;
+            const filter = {
+                _id: new ObjectId(id)
+            }
+            const updateDoc = {
+                $set: updateInfo
+            }
+            const result = await infoCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        });
     }
     finally {
 
